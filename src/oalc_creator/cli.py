@@ -10,11 +10,16 @@ from rich.traceback import install
 
 from .creator import Creator, SOURCES
 
-# Use `uvloop` instead of `asyncio` if it's available.
+# Use `uvloop` or `winloop` instead of `asyncio` if it's available.
 try:
     from uvloop import run as async_run
+    
 except ImportError:
-    from asyncio import run as async_run
+    try:
+        from winloop import run as async_run
+        
+    except ImportError:
+        from asyncio import run as async_run
 
 # Setup traceback pretty printing with `rich` (suppressing full traceback for exceptions raised by `rich`, `click` and `asyncio`).
 install(suppress=[rich, click, asyncio])
