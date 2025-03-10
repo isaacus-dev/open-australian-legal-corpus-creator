@@ -8,6 +8,8 @@ To learn more about the Corpus and how it was built, please see Umar Butler's ar
 ## Requirements
 The Open Australian Legal Corpus Creator requires Python 3.10 or higher, along with [`tesserocr`](https://github.com/sirfz/tesserocr).
 
+Windows users have the option of installing [`winloop`](https://github.com/Vizonex/Winloop), the Windows port of [`uvloop`](https://github.com/MagicStack/uvloop) (which is automatically installed for Linux users), in order to speed up downloads.
+
 Before running the Creator, it is **essential** that you are authorised to scrape and use the sources' data.
 
 ## Installation
