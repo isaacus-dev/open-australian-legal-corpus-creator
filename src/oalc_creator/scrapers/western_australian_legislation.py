@@ -83,7 +83,7 @@ class WesternAustralianLegislation(Scraper):
     @log
     async def _get_entry(self, row: str, type: str) -> Entry:       
         # Extract the id and title of the document from the link to its entry.
-        doc_id, title = re.search(r"<a href='([\w\d_]+)\.html' class='[\w]+ alive'>((?:.|\n)*?)</a>", row).groups()
+        doc_id, title = re.search(r"<a href='([\w\d_]+)\.html(?:&[^']*)*' class='[\w]+ alive'>((?:.|\n)*?)</a>", row).groups()
         
         # Extract the version id from the link to the DOCX version of the document.
         version_id = re.search(r"<a href='RedirectURL\?OpenAgent&amp;query=([^']*)\.docx' class='tooltip' target='_blank'>", row).group(1)
