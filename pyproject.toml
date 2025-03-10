@@ -48,7 +48,6 @@ classifiers = [
 ]
 dependencies = [
     "aiohttp>=3.9.0b0",
-    "alive_progress",
     "click",
     "frozndict",
     "inscriptis",
@@ -67,6 +66,8 @@ dependencies = [
     "tesserocr",
     "pypdfium2",
     "pillow",
+    "ftfy",
+    "tqdm",
 ]
 
 [project.urls]

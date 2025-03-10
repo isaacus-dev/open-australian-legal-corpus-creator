@@ -15,11 +15,11 @@ import aiohttp
 
 from msgspec import DecodeError
 from platformdirs import user_data_dir
+from tqdm.asyncio import tqdm_asyncio
 from rich.markdown import Markdown
 
 from .data import encoder, Entries, Request, entries_decoder, document_decoder, requests_decoder
-from .helpers import (log, console, warning, load_json, save_json, load_jsonl, save_jsonl, alive_gather,
-                      alive_as_completed)
+from .helpers import log, console, warning, load_json, save_json, load_jsonl, save_jsonl
 from .scraper import Scraper
 from .metadata import DATA_VERSIONS
 from .scrapers import (NswCaselaw, NswLegislation, HighCourtOfAustralia, TasmanianLegislation, QueenslandLegislation,
@@ -196,7 +196,7 @@ class Creator:
         """Update the Corpus."""
         
         console.print(Markdown('# Open Australian Legal Corpus Creator'), style='light_cyan1')
-        
+
         # Create a new `aiohttp` session using a with statement to ensure that the session is always closed.
         async with aiohttp.ClientSession() as session:
             # Set the scrapers' sessions to the new session. This improves performance vis-a-vis creating new sessions for each request.
@@ -204,7 +204,7 @@ class Creator:
 
             # Get requests for document indices.
             console.print('Determining what document indices must be searched in order to create an index of documents to be included in the Corpus.', style='light_cyan1 bold')
-            index_reqs = await alive_gather(*[self._get_index_reqs(scraper) for scraper in self.scrapers.values()])
+            index_reqs = await tqdm_asyncio.gather(*[self._get_index_reqs(scraper) for scraper in self.scrapers.values()])
             
             # Determine which document indices have not yet been indexed and attach their scrapers.
             unindexed_index_reqs = [[scraper, self._get_unindexed_index_reqs(scraper, reqs)] for scraper, reqs in zip(self.scrapers.values(), index_reqs)]
@@ -228,7 +228,7 @@ class Creator:
                     index_files = {source : stack.enter_context(open(os.path.join(self.index_dir, f'{source}.jsonl'), 'ab')) for source in sources_with_unindexed_indices}
                     
                     # Append requests, entries and the time they were indexed to the sources' index files as they are indexed.
-                    for source_index in alive_as_completed([self._get_index(scraper, req) for scraper, req in unindexed_index_reqs]):
+                    for source_index in tqdm_asyncio.as_completed([self._get_index(scraper, req) for scraper, req in unindexed_index_reqs]):
                         source, index = await source_index
                         
                         index_files[source].write(encoder(index))
@@ -297,7 +297,7 @@ class Creator:
             console.print('\nAdding documents to the Corpus.', style='light_cyan1 bold')
             
             with open(self.corpus_path, 'ab') as f:
-                for doc in alive_as_completed([scraper.get_doc(entry) for scraper, entry in missing_entries]):
+                for doc in tqdm_asyncio.as_completed([scraper.get_doc(entry) for scraper, entry in missing_entries]):
                     doc = await doc
 
                     if doc:

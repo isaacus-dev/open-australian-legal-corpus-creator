@@ -7,13 +7,17 @@ from datetime import datetime
 from textwrap import dedent
 from contextlib import suppress
 
+import ftfy
 import orjson
 import msgspec
 
 from rich.console import Console
-from alive_progress import alive_bar
 
 console = Console()
+
+NON_STANDARD_CONTROL_CHARS_RE = re.compile(r'[' + re.escape('\a\b\f\r\v') + ']')
+START_OF_TEXT_THAT_IS_ONLY_WHITESPACE_FOLLOWED_BY_A_NEWLINE_RE = re.compile(r'^\s*\n')
+END_OF_TEXT_THAT_IS_ONLY_WHITESPACE_PRECEDED_BY_A_NEWLINE_RE = re.compile(r'\n\s*$')
 
 def log(func: Callable) -> Callable:
     """Log any arguments passed to a function when an exception arises."""
@@ -30,7 +34,7 @@ def log(func: Callable) -> Callable:
         try:
             return func(*args, **kwargs)
         
-        except Exception as e:
+        except Exception as e:  
             warning(ERROR_MESSAGE.format(
                 func=func,
                 e=e,
@@ -82,48 +86,6 @@ def save_jsonl(path: str, content: list, encoder: Callable[[Any], bytes] = msgsp
             file.write(encoder(entry))
             file.write(b'\n')
 
-async def alive_gather(*funcs):
-    """`asyncio.gather` with a progress bar from `alive_progress`."""
-    
-    # Initalise the progress bar.
-    with alive_bar(len(funcs)) as bar:
-        # Create a wrapper function to update the progress bar and preserve the order of the results.
-        async def wrapper(i, func):
-            # Wait for the result.
-            res = await func
-            
-            # Update the progress bar.
-            bar()
-            
-            # Return the index and result.
-            return i, res
-        
-        # Wrap the functions and wait for the results.
-        res = [await func for func in asyncio.as_completed([wrapper(i, func) for i, func in enumerate(funcs)])]
-        
-        # Return the results sorted by index.
-        return [r for _, r in sorted(res)]
-
-def alive_as_completed(funcs):
-    """`asyncio.as_completed` with a progress bar from `alive_progress`."""
-    
-    # Initalise the progress bar.
-    with alive_bar(len(funcs)) as bar:
-        # Create a wrapper function to update the progress bar.
-        async def wrapper(func):
-            # Wait for the result.
-            res = await func
-            
-            # Update the progress bar.
-            bar()
-            
-            # Return the result.
-            return res
-        
-        # Wrap the functions and yield the results.
-        for func in asyncio.as_completed([wrapper(func) for func in funcs]):
-            yield func
-
 def warning(message: str) -> None:
     """Log a warning message."""
     
@@ -138,26 +100,37 @@ def format_date(date: str) -> str:
     
     return datetime.strptime(date, '%d/%m/%Y').strftime('%Y-%m-%d')
 
-def clean_text(text: str) -> str:
+def clean_text(
+    text: str,
+    fix_encoding: bool = True,
+    normalise_nbsp: bool = True,
+    remove_non_standard_ccs: bool = True,
+    remove_unnecessary_whitespace: bool = True,
+) -> str:
     """Clean text."""
     
-    # Replace non-breaking spaces with regular spaces.
-    text = text.replace('\xa0', ' ')
+    # Fix encoding issues.
+    if fix_encoding:
+        text = ftfy.fix_text(text)
+    
+    # Remove non-breaking spaces.
+    if normalise_nbsp:
+        text = text.replace('\xa0', ' ')
+    
+    # Remove non-standard control characters.
+    if remove_non_standard_ccs:
+        text = NON_STANDARD_CONTROL_CHARS_RE.sub('', text)
+    
+    # Remove unnecessary whitespace.
+    if remove_unnecessary_whitespace:
+        # Remove whitespace from lines comprised entirely of whitespace.
+        text = '\n'.join([re.sub(r'\s+$', '', line) for line in text.split('\n')])
 
-    # Replace return carriages followed by newlines with newlines.
-    text = text.replace(r'\r\n', '\n')
+        # If the text begins with a newline or a newline preceded by whitespace, remove it and any preceding whitespace.
+        text = START_OF_TEXT_THAT_IS_ONLY_WHITESPACE_FOLLOWED_BY_A_NEWLINE_RE.sub('', text)
 
-    # Remove whitespace from lines comprised entirely of whitespace.
-    text = re.sub(r'(?<=\n)\s*(?=\n)', '\n', text)
-
-    # If the text begins with a newline or a newline preceded by whitespace, remove it and any preceding whitespace.
-    text = re.sub(r'^\s*\n', '', text)
-
-    # If the text ends with a newline or a newline succeeded by whitespace, remove it and any succeeding whitespace.
-    text = re.sub(r'\n\s*$', '', text)
-
-    # Remove spaces and tabs from the ends of lines.
-    text = re.sub(r'[ \t]+\n', '\n', text)
+        # If the text ends with a newline or a newline succeeded by whitespace, remove it and any succeeding whitespace.
+        text = END_OF_TEXT_THAT_IS_ONLY_WHITESPACE_PRECEDED_BY_A_NEWLINE_RE.sub('', text)
     
     return text
 
