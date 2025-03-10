@@ -39,8 +39,8 @@ class Scraper(ABC):
         
         Args:
             source (str): The name of the source.
-            indices_refresh_interval (timedelta | bool, optional): The interval at which to refresh document indices or `True` if document indices must be refreshed. Defaults to 1 day.
-            index_refresh_interval (timedelta | bool, optional): The interval at which to refresh the document index or `True` if the document index must be refreshed. Defaults to 1 day.
+            indices_refresh_interval (timedelta | bool, optional): The interval at which to refresh document indices or `True` if document indices must be refreshed. Defaults to 2 weeks.
+            index_refresh_interval (timedelta | bool, optional): The interval at which to refresh the document index or `True` if the document index must be refreshed. Defaults to 2 weeks.
             semaphore (asyncio.Semaphore, optional): A semaphore for limiting the number of concurrent requests. Defaults to a semaphore with a limit of 30.
             session (aiohttp.ClientSession, optional): An `aiohttp` session to use for making requests. Defaults to `None`, thereby creating a new session for every request.
             retry_exceptions (tuple[type[BaseException]], optional): A tuple of exceptions to retry on. Defaults to a tuple of `asyncio.TimeoutError`, `aiohttp.ClientConnectorError`, `aiohttp.client_exceptions.ServerDisconnectedError`, `aiohttp.client_exceptions.ClientOSError`, `aiohttp.client_exceptions.ClientPayloadError`, and `aiohttp.client_exceptions.ClientResponseError`.
@@ -51,10 +51,10 @@ class Scraper(ABC):
         self.source: str = source
         """The name of the source."""
         
-        self.indices_refresh_interval: timedelta | bool = indices_refresh_interval or timedelta(days=1)
+        self.indices_refresh_interval: timedelta | bool = indices_refresh_interval or timedelta(weeks=2)
         """The interval at which to refresh document indices or `True` if document indices must be refreshed."""
         
-        self.index_refresh_interval: timedelta | bool = index_refresh_interval or timedelta(days=1)
+        self.index_refresh_interval: timedelta | bool = index_refresh_interval or timedelta(weeks=2)
         """The interval at which to refresh the document index or `True` if the document index must be refreshed."""
         
         self.semaphore: asyncio.Semaphore = semaphore or asyncio.Semaphore(30)
