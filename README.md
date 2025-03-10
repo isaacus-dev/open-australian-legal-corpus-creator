@@ -1,9 +1,9 @@
 # Open Australian Legal Corpus Creator
-<a href="https://github.com/umarbutler/open-australian-legal-corpus-creator" alt="Release"><img src="https://img.shields.io/badge/release-v3.1.0-green"></a>
+<a href="https://github.com/isaacus-dev/open-australian-legal-corpus-creator" alt="Release"><img src="https://img.shields.io/badge/release-v3.1.0-green"></a>
 
-The [Open Australian Legal Corpus](https://huggingface.co/datasets/umarbutler/open-australian-legal-corpus) is the first and only multijurisdictional open corpus of Australian legislative and judicial documents. This repository contains the code used to create and update the Corpus.
+The [Open Australian Legal Corpus](https://huggingface.co/datasets/isaacus-dev/open-australian-legal-corpus) is the first and only multijurisdictional open corpus of Australian legislative and judicial documents. This repository contains the code used to create and update the Corpus.
 
-To learn more about the Corpus and how it was built, please see Umar Butler's article, [*How I built the largest open database of Australian law*](https://umarbutler.com/how-i-built-the-largest-open-database-of-australian-law/). If you're looking to download the Corpus, you may do so on [Hugging Face](https://huggingface.co/datasets/umarbutler/open-australian-legal-corpus).
+To learn more about the Corpus and how it was built, please see Umar Butler's article, [*How I built the largest open database of Australian law*](https://umarbutler.com/how-i-built-the-largest-open-database-of-australian-law/). If you're looking to download the Corpus, you may do so on [Hugging Face](https://huggingface.co/datasets/isaacus/open-australian-legal-corpus).
 
 ## Requirements
 The Open Australian Legal Corpus Creator requires Python 3.10 or higher, along with [`tesserocr`](https://github.com/sirfz/tesserocr).
@@ -15,7 +15,7 @@ Before running the Creator, it is **essential** that you are authorised to scrap
 ## Installation
 Install [`tesserocr`](https://github.com/sirfz/tesserocr) by following the instructions [here](https://github.com/sirfz/tesserocr?tab=readme-ov-file#installation) and then run the following command:
 ```bash
-pip install git+https://github.com/umarbutler/open-australian-legal-corpus-creator
+pip install git+https://github.com/isaacus-dev/open-australian-legal-corpus-creator
 ```
 
 ## Usage

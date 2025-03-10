@@ -6,6 +6,7 @@ build-backend = "hatchling.build"
 name = "oalc-creator"
 version = "3.1.0"
 authors = [
+  {name="Isaacus", email="support@isaacus.com"},
   {name="Umar Butler", email="umar@umar.au"},
 ]
 description = "The creator of the Open Australian Legal Corpus"
@@ -71,10 +72,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/umarbutler/open-australian-legal-corpus-creator"
-Documentation = "https://github.com/umarbutler/open-australian-legal-corpus-creator/blob/main/README.md"
-Issues = "https://github.com/umarbutler/open-australian-legal-corpus-creator/issues"
-Source = "https://github.com/umarbutler/open-australian-legal-corpus-creator"
+Homepage = "https://github.com/isaacus-dev/open-australian-legal-corpus-creator"
+Documentation = "https://github.com/isaacus-dev/open-australian-legal-corpus-creator/blob/main/README.md"
+Issues = "https://github.com/isaacus-dev/open-australian-legal-corpus-creator/issues"
+Source = "https://github.com/isaacus-dev/open-australian-legal-corpus-creator"
 
 [project.scripts]
 mkoalc = "oalc_creator.cli:create"

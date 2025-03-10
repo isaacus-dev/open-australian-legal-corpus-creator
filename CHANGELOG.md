@@ -14,11 +14,12 @@ All notable changes to the Open Australian Legal Corpus Creator will be document
 
 ### Changed
 - Switched from [`alive-progress`](https://github.com/rsalmei/alive-progress) to [`tqdm`](https://github.com/tqdm/tqdm) for progress bars in order to speed up scraping.
-- Increased default indices and index refresh intervals from one day to two weeks. 
+- Increased default indices and index refresh intervals from one day to two weeks.
+- Transferred the Open Australian Legal Corpus Creator to Isaacus.
 
 ## [3.0.4] - 2024-08-08
 ### Fixed
-- Fixed the fact that, when the Creator was run, it would unnecessarily rewrite the entire Corpus in order to detect and remove duplicates, outdated documents and otherwise repair it (which caused excessive writes and overwore disks) by instead first reading the Corpus and then only overwriting it if found necessary as, although this can sometimes double read time, reading is much cheaper on SSDs (which most modern drives are) than writing ([#2](https://github.com/umarbutler/open-australian-legal-corpus-creator/issues/2)).
+- Fixed the fact that, when the Creator was run, it would unnecessarily rewrite the entire Corpus in order to detect and remove duplicates, outdated documents and otherwise repair it (which caused excessive writes and overwore disks) by instead first reading the Corpus and then only overwriting it if found necessary as, although this can sometimes double read time, reading is much cheaper on SSDs (which most modern drives are) than writing ([#2](https://github.com/isaacus-dev/open-australian-legal-corpus-creator/issues/2)).
 
 ## [3.0.3] - 2024-08-05
 ### Fixed
@@ -74,7 +75,7 @@ All notable changes to the Open Australian Legal Corpus Creator will be document
 
 ## [1.0.1] - 2024-02-17
 ### Fixed
-- Refactored the scraper for the Federal Register of Legislation database in order to resolve breaking API changes brought about by the database's redesign, thereby fixing [#1](https://github.com/umarbutler/open-australian-legal-corpus-creator/issues/1).
+- Refactored the scraper for the Federal Register of Legislation database in order to resolve breaking API changes brought about by the database's redesign, thereby fixing [#1](https://github.com/isaacus-dev/open-australian-legal-corpus-creator/issues/1).
 
 ## [1.0.0] - 2023-11-09
 ### Added
@@ -130,15 +131,15 @@ All notable changes to the Open Australian Legal Corpus Creator will be document
 - Reduced excessive line breaks in texts.
 - Improved the extraction and cleaning of citations.
 
-[3.1.0]: https://github.com/umarbutler/open-australian-legal-corpus-creator/compare/v3.0.4...v3.1.0
-[3.0.4]: https://github.com/umarbutler/open-australian-legal-corpus-creator/compare/v3.0.3...v3.0.4
-[3.0.3]: https://github.com/umarbutler/open-australian-legal-corpus-creator/compare/v3.0.2...v3.0.3
-[3.0.2]: https://github.com/umarbutler/open-australian-legal-corpus-creator/compare/v3.0.1...v3.0.2
-[3.0.1]: https://github.com/umarbutler/open-australian-legal-corpus-creator/compare/v3.0.0...v3.0.1
-[3.0.0]: https://github.com/umarbutler/open-australian-legal-corpus-creator/compare/v2.0.0...v3.0.0
-[2.0.0]: https://github.com/umarbutler/open-australian-legal-corpus-creator/compare/v1.0.1...v2.0.0
-[1.0.1]: https://github.com/umarbutler/open-australian-legal-corpus-creator/compare/v1.0.0...v1.0.1
-[1.0.0]: https://github.com/umarbutler/open-australian-legal-corpus-creator/compare/v0.1.2...v1.0.0
-[0.1.2]: https://github.com/umarbutler/open-australian-legal-corpus-creator/compare/v0.1.1...v0.1.2
-[0.1.1]: https://github.com/umarbutler/open-australian-legal-corpus-creator/compare/v0.1.0...v0.1.1
-[0.1.0]: https://github.com/umarbutler/open-australian-legal-corpus-creator/releases/tag/v0.1.0
+[3.1.0]: https://github.com/isaacus-dev/open-australian-legal-corpus-creator/compare/v3.0.4...v3.1.0
+[3.0.4]: https://github.com/isaacus-dev/open-australian-legal-corpus-creator/compare/v3.0.3...v3.0.4
+[3.0.3]: https://github.com/isaacus-dev/open-australian-legal-corpus-creator/compare/v3.0.2...v3.0.3
+[3.0.2]: https://github.com/isaacus-dev/open-australian-legal-corpus-creator/compare/v3.0.1...v3.0.2
+[3.0.1]: https://github.com/isaacus-dev/open-australian-legal-corpus-creator/compare/v3.0.0...v3.0.1
+[3.0.0]: https://github.com/isaacus-dev/open-australian-legal-corpus-creator/compare/v2.0.0...v3.0.0
+[2.0.0]: https://github.com/isaacus-dev/open-australian-legal-corpus-creator/compare/v1.0.1...v2.0.0
+[1.0.1]: https://github.com/isaacus-dev/open-australian-legal-corpus-creator/compare/v1.0.0...v1.0.1
+[1.0.0]: https://github.com/isaacus-dev/open-australian-legal-corpus-creator/compare/v0.1.2...v1.0.0
+[0.1.2]: https://github.com/isaacus-dev/open-australian-legal-corpus-creator/compare/v0.1.1...v0.1.2
+[0.1.1]: https://github.com/isaacus-dev/open-australian-legal-corpus-creator/compare/v0.1.0...v0.1.1
+[0.1.0]: https://github.com/isaacus-dev/open-australian-legal-corpus-creator/releases/tag/v0.1.0
