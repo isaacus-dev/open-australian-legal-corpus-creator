@@ -172,7 +172,7 @@ class FederalCourtOfAustralia(Scraper):
                     mime = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
                     
                     # Extract the url of the DOCX version of the document.
-                    url = re.search(rb'<a\s+href="([^"]+)"\s*>Original Word Document', resp).group(1).decode('cp1252')
+                    url = re.search(rb'<a\s+href="([^"]+)"[^>]*>Original Word Document', resp).group(1).decode('cp1252')
                     
                     # Retrieve the DOCX version of the document.
                     resp = await self.get(url)
