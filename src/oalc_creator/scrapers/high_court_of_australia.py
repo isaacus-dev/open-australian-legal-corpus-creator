@@ -2,6 +2,7 @@ import re
 import asyncio
 
 from datetime import datetime, timedelta
+from contextlib import nullcontext
 from concurrent.futures import ThreadPoolExecutor
 
 import pytz
@@ -45,6 +46,11 @@ class HighCourtOfAustralia(Scraper):
 
         self._type = 'decision'
         self._jurisdiction = 'commonwealth'
+
+        # Steal the superclass's semaphore and then make it private.
+        # NOTE Because it is possible for us to make multiple requests within a single function call, we need to use the semaphore on entire calls instead of individual requests, which is why we take it from the superclass.
+        self._semaphore = self.semaphore
+        self.semaphore = nullcontext()
 
         # NOTE We increase our wait times to account for the High Court of Australia database's rate limiting.
         self.stop_after_waiting += 30 * 60
@@ -118,48 +124,61 @@ class HighCourtOfAustralia(Scraper):
 
     @log
     async def _get_doc(self, entry: Entry) -> Document | None:
-        # Retrieve the document.
-        resp = await self.get(entry.request)
-
-        # Store the url of the document so that we may overwrite it if necessary.
-        url = entry.request.path
-
-        # Extract the date of the document if available.
-        if date := re.search(r'<h2>(\d{1,2} [A-Z][a-z]+ \d{4})</h2>', resp.text):
-            date = datetime.strptime(date.group(1), '%d %b %Y').strftime('%Y-%m-%d')
-
-        # NOTE Documents in the High Court of Australia database will either be HTML only or will be stored as PDFs, DOCXs, DOCs and/or RTFs. If a download button exists, that means that the document is not available as HTML. Therefore, we begin searching for whether that is the case.
-        if download_links:=re.findall(r'<a[^>]+href="([^"]+)"[^>]*>(PDF|View|Download|DOCX|RTF)</a>', resp.text):
-            # NOTE We use the last link because the first link is always PDF and we prefer other document types over PDFs.
-            slug, type_ = download_links[-1]
-
-            url = f'https://eresources.hcourt.gov.au{slug}'
-
-            # Determine the document's type.
-            type_ = self._button_types[type_]
-
+        async with self._semaphore:
             # Retrieve the document.
-            resp = await self.get(url)
+            resp = await self.get(entry.request)
 
-            # Return `None` if the document is missing.
-            if b'Document could not be found' in resp or b'There were no matching cases.' in resp:
-                warning(f"Unable to extract text from '{entry.request.path}' as it appears to be missing. Returning `None`.")
-                
-                return
+            # Store the url of the document so that we may overwrite it if necessary.
+            url = entry.request.path
 
-        else:
-            type_ = 'HTML'
+            # Extract the date of the document if available.
+            if date := re.search(r'<h2>(\d{1,2} [A-Z][a-z]+ \d{4})</h2>', resp.text):
+                date = datetime.strptime(date.group(1), '%d %b %Y').strftime('%Y-%m-%d')
 
-        match type_:
-            case 'RTF':
-                # If a `UnicodeDecodeError` is raised, then we know that the document is actually a DOC (despite the fact that it was labelled an RTF).
-                try:
-                    text = rtf_to_text(resp.text, encoding='cp1252', errors='ignore')
+            # NOTE Documents in the High Court of Australia database will either be HTML only or will be stored as PDFs, DOCXs, DOCs and/or RTFs. If a download button exists, that means that the document is not available as HTML. Therefore, we begin searching for whether that is the case.
+            if download_links:=re.findall(r'<a[^>]+href="([^"]+)"[^>]*>(PDF|View|Download|DOCX|RTF)</a>', resp.text):
+                # NOTE We use the last link because the first link is always PDF and we prefer other document types over PDFs.
+                slug, type_ = download_links[-1]
 
-                    # Store the mime of the document.
-                    mime = 'application/rtf'
+                url = f'https://eresources.hcourt.gov.au{slug}'
 
-                except UnicodeDecodeError:
+                # Determine the document's type.
+                type_ = self._button_types[type_]
+
+                # Retrieve the document.
+                resp = await self.get(url)
+
+                # Return `None` if the document is missing.
+                if b'Document could not be found' in resp or b'There were no matching cases.' in resp:
+                    warning(f"Unable to extract text from '{entry.request.path}' as it appears to be missing. Returning `None`.")
+                    
+                    return
+
+            else:
+                type_ = 'HTML'
+
+            match type_:
+                case 'RTF':
+                    # If a `UnicodeDecodeError` is raised, then we know that the document is actually a DOC (despite the fact that it was labelled an RTF).
+                    try:
+                        text = rtf_to_text(resp.text, encoding='cp1252', errors='ignore')
+
+                        # Store the mime of the document.
+                        mime = 'application/rtf'
+
+                    except UnicodeDecodeError:
+                        # Convert the document to HTML.
+                        # NOTE Converting DOCX files to HTML with `mammoth` outperforms using `pypandoc`, `python-docx`, `docx2txt` and `docx2python` to convert DOCX files directly to text.
+                        html = docx2html(resp.stream)
+
+                        # Extract text from the generated HTML.
+                        etree = lxml.html.fromstring(html.value)
+                        text = CustomInscriptis(etree, self._inscriptis_config).get_text()
+
+                        # Store the mime of the document.
+                        mime = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+
+                case 'DOCX':
                     # Convert the document to HTML.
                     # NOTE Converting DOCX files to HTML with `mammoth` outperforms using `pypandoc`, `python-docx`, `docx2txt` and `docx2python` to convert DOCX files directly to text.
                     html = docx2html(resp.stream)
@@ -171,51 +190,39 @@ class HighCourtOfAustralia(Scraper):
                     # Store the mime of the document.
                     mime = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
 
-            case 'DOCX':
-                # Convert the document to HTML.
-                # NOTE Converting DOCX files to HTML with `mammoth` outperforms using `pypandoc`, `python-docx`, `docx2txt` and `docx2python` to convert DOCX files directly to text.
-                html = docx2html(resp.stream)
+                case 'PDF':
+                    # Extract the text of the document from the PDF with OCR.
+                    # NOTE We use a scale of 2 instead of the default of 3 because the PDFs on the High Court of Australia database are *extremely* slow to OCR.
+                    text = await pdf2txt(resp.stream, self.ocr_batch_size, self.thread_pool_executor, self.ocr_semaphore, scale=2)
 
-                # Extract text from the generated HTML.
-                etree = lxml.html.fromstring(html.value)
-                text = CustomInscriptis(etree, self._inscriptis_config).get_text()
+                    # Store the mime of the document.
+                    mime = 'application/pdf'
 
-                # Store the mime of the document.
-                mime = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                case 'HTML':
+                    # Construct an etree from the response.
+                    etree = lxml.html.fromstring(resp.text)
 
-            case 'PDF':
-                # Extract the text of the document from the PDF with OCR.
-                # NOTE We use a scale of 2 instead of the default of 3 because the PDFs on the High Court of Australia database are *extremely* slow to OCR.
-                text = await pdf2txt(resp.stream, self.ocr_batch_size, self.thread_pool_executor, self.ocr_semaphore, scale=2)
+                    # Retrieve the element containing the text of the decision.
+                    text_elm = etree.xpath('//div[@class="wellCase"]')[0]
 
-                # Store the mime of the document.
-                mime = 'application/pdf'
+                    # Extract the text of the decision.
+                    text = CustomInscriptis(text_elm, self._inscriptis_config).get_text()
 
-            case 'HTML':
-                # Construct an etree from the response.
-                etree = lxml.html.fromstring(resp.text)
+                    # Remove newlines from the beginning of the text.
+                    text = re.sub(r'^\n+', '', text)
 
-                # Retrieve the element containing the text of the decision.
-                text_elm = etree.xpath('//div[@class="wellCase"]')[0]
+                    # Store the mime of the document.
+                    mime = 'text/html'
 
-                # Extract the text of the decision.
-                text = CustomInscriptis(text_elm, self._inscriptis_config).get_text()
-
-                # Remove newlines from the beginning of the text.
-                text = re.sub(r'^\n+', '', text)
-
-                # Store the mime of the document.
-                mime = 'text/html'
-
-        # Create the document.
-        return make_doc(
-            version_id=entry.version_id,
-            type=entry.type,
-            jurisdiction=entry.jurisdiction,
-            source=entry.source,
-            mime=mime,
-            date=date,
-            citation=entry.title,
-            url=url,
-            text=text,
-        )
+            # Create the document.
+            return make_doc(
+                version_id=entry.version_id,
+                type=entry.type,
+                jurisdiction=entry.jurisdiction,
+                source=entry.source,
+                mime=mime,
+                date=date,
+                citation=entry.title,
+                url=url,
+                text=text,
+            )
