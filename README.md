@@ -1,5 +1,5 @@
 # Open Australian Legal Corpus Creator
-<a href="https://github.com/umarbutler/open-australian-legal-corpus-creator" alt="Release"><img src="https://img.shields.io/badge/release-v3.0.4-green"></a>
+<a href="https://github.com/umarbutler/open-australian-legal-corpus-creator" alt="Release"><img src="https://img.shields.io/badge/release-v3.1.0-green"></a>
 
 The [Open Australian Legal Corpus](https://huggingface.co/datasets/umarbutler/open-australian-legal-corpus) is the first and only multijurisdictional open corpus of Australian legislative and judicial documents. This repository contains the code used to create and update the Corpus.
 

@@ -1,6 +1,21 @@
 ## Changelog 🔄
 All notable changes to the Open Australian Legal Corpus Creator will be documented here. This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] - 2025-03-10
+## Added
+- Updated the cleaning routine to remove all control characters from texts apart from newlines and tabs.
+- Began fixing Unicode encoding errors with [`ftfy`](https://github.com/rspeer/python-ftfy).
+- Started using [`winloop`](https://github.com/Vizonex/Winloop) instead of `asyncio` if it is already installed in order to speed up scraping on Windows.
+- Began sending default Brave Browser headers with requests to ensure maximum compatibility with websites.
+
+### Fixed
+- Fixed a bug with the cleaning of texts that caused the insertion and removal of extra newlines.
+- Fixed a bug that caused the scraping of documents from the Federal Register of Legislation and possibly the High Court of Australia to take an inordinate amount of time and fail extremely often due to the fact that multiple asynchronous requests can be made in a single `_get_doc()` call and, although semaphores were used for those requests, the semaphore should have been used for the `_get_doc()` call itself instead.
+
+### Changed
+- Switched from [`alive-progress`](https://github.com/rsalmei/alive-progress) to [`tqdm`](https://github.com/tqdm/tqdm) for progress bars in order to speed up scraping.
+- Increased default indices and index refresh intervals from one day to two weeks. 
+
 ## [3.0.4] - 2024-08-08
 ### Fixed
 - Fixed the fact that, when the Creator was run, it would unnecessarily rewrite the entire Corpus in order to detect and remove duplicates, outdated documents and otherwise repair it (which caused excessive writes and overwore disks) by instead first reading the Corpus and then only overwriting it if found necessary as, although this can sometimes double read time, reading is much cheaper on SSDs (which most modern drives are) than writing ([#2](https://github.com/umarbutler/open-australian-legal-corpus-creator/issues/2)).
@@ -115,6 +130,7 @@ All notable changes to the Open Australian Legal Corpus Creator will be document
 - Reduced excessive line breaks in texts.
 - Improved the extraction and cleaning of citations.
 
+[3.1.0]: https://github.com/umarbutler/open-australian-legal-corpus-creator/compare/v3.0.4...v3.1.0
 [3.0.4]: https://github.com/umarbutler/open-australian-legal-corpus-creator/compare/v3.0.3...v3.0.4
 [3.0.3]: https://github.com/umarbutler/open-australian-legal-corpus-creator/compare/v3.0.2...v3.0.3
 [3.0.2]: https://github.com/umarbutler/open-australian-legal-corpus-creator/compare/v3.0.1...v3.0.2
