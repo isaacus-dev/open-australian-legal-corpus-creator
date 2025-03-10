@@ -70,7 +70,7 @@ class FederalRegisterOfLegislation(Scraper):
         self._inscriptis_config = CustomParserConfig(inscriptis_profile)
         
         # Define the maximum number of documents that can be returned by a search engine results page ('SERP').
-        self._docs_per_serp = 500
+        self._docs_per_serp = 100
         
         # Map database collection names to document types and jurisdictions.
         self._collections = {

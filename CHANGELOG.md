@@ -12,6 +12,7 @@ All notable changes to the Open Australian Legal Corpus Creator will be document
 - Fixed a bug with the cleaning of texts that caused the insertion and removal of extra newlines.
 - Fixed a bug that caused the scraping of documents from the Federal Register of Legislation and possibly the High Court of Australia to take an inordinate amount of time and fail extremely often due to the fact that multiple asynchronous requests can be made in a single `_get_doc()` call and, although semaphores were used for those requests, the semaphore should have been used for the `_get_doc()` call itself instead.
 - Fixed a bug preventing the indexing of documents on the Western Australian Legislation database due to the fact that it is now possible for links to legislation in indices to contain query parameters (eg, https://www.legislation.wa.gov.au/legislation/statutes.nsf/law_a2089.html&view=consolidated used to just be https://www.legislation.wa.gov.au/legislation/statutes.nsf/law_a2089.html) thereby breaking the existing regex used to extract document IDs from such links.
+- Reduced the maximum number of documents that can be returned by a search engine results page of the Federal Register of Legislation database from 500 to 100 as the FLR database now enforces that limit.
 
 ### Changed
 - Switched from [`alive-progress`](https://github.com/rsalmei/alive-progress) to [`tqdm`](https://github.com/tqdm/tqdm) for progress bars in order to speed up scraping.
