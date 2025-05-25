@@ -1,6 +1,10 @@
 ## Changelog 🔄
 All notable changes to the Open Australian Legal Corpus Creator will be documented here. This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.1] - 2025-05-25
+### Fixed
+- Updated the base url of the Federal Court of Australia database due to a internal change on their part, fixing [#4](https://github.com/isaacus-dev/open-australian-legal-corpus-creator/issues/4).
+
 ## [3.1.0] - 2025-03-10
 ## Added
 - Updated the cleaning routine to remove all control characters from texts apart from newlines and tabs.
@@ -134,6 +138,7 @@ All notable changes to the Open Australian Legal Corpus Creator will be document
 - Reduced excessive line breaks in texts.
 - Improved the extraction and cleaning of citations.
 
+[3.1.1]: https://github.com/isaacus-dev/open-australian-legal-corpus-creator/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/isaacus-dev/open-australian-legal-corpus-creator/compare/v3.0.4...v3.1.0
 [3.0.4]: https://github.com/isaacus-dev/open-australian-legal-corpus-creator/compare/v3.0.3...v3.0.4
 [3.0.3]: https://github.com/isaacus-dev/open-australian-legal-corpus-creator/compare/v3.0.2...v3.0.3

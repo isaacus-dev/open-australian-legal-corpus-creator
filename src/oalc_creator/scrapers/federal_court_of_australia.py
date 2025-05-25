@@ -48,7 +48,7 @@ class FederalCourtOfAustralia(Scraper):
 
         self._type = 'decision'
         
-        self._base_url = 'https://search2.fedcourt.gov.au/s/search.html?collection=judgments&sort=adate&meta_v_phrase_orsand=judgments/Judgments&'
+        self._base_url = 'https://search.judgments.fedcourt.gov.au/s/search.html?collection=fca%7Esp-judgments-internet&profile=judgments-internet&sort=adate&meta_CourtID_orsand=FCA+FCAFC+IRCA+ACOMPT+ACOPYT+ADFDAT+FPDT+NFSC&meta_MNC=&meta_Judge=&meta_Reported=&meta_FileNumber=&meta_NPA_phrase_orsand=&query_sand=&query_or=&query_not=&query_phrase=&query_prox=&meta_d=&meta_d1=&meta_d2=&meta_Legislation=&meta_CasesCited=&meta_Catchwords=&'
         self._decisions_per_page = 20
         
         # Create a custom Inscriptis CSS profile.
