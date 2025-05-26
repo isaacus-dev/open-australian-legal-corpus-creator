@@ -1,3 +1,4 @@
+from zipfile import BadZipFile
 import re
 import math
 import asyncio
@@ -179,7 +180,13 @@ class FederalCourtOfAustralia(Scraper):
 
                     # Convert the document to HTML.
                     # NOTE Converting DOCX files to HTML with `mammoth` outperforms using `pypandoc`, `python-docx`, `docx2txt` and `docx2python` to convert DOCX files directly to text.
-                    html = docx2html(resp.stream)
+                    try:
+                        html = docx2html(resp.stream)
+                    
+                    except BadZipFile as e:
+                        warning(f'Unable to convert DOCX file from {url} to HTML. BadZipFile encountered: {e}. It is most likely a DOC file rather than a DOCX file (which is not currently supported). Returning `None` instead.')
+                        
+                        return None
 
                     # Extract text from the generated HTML.
                     etree = lxml.html.fromstring(html.value)

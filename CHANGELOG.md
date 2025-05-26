@@ -1,6 +1,10 @@
 ## Changelog 🔄
 All notable changes to the Open Australian Legal Corpus Creator will be documented here. This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.2] - 2025-05-26
+### Fixed
+- Fixed a bug where documents from the Federal Court of Australia that are stored only as DOC files (and not DOCX files) were not being skipped and were instead parsed as DOCX files.
+
 ## [3.1.1] - 2025-05-25
 ### Fixed
 - Updated the base url of the Federal Court of Australia database due to a internal change on their part, fixing [#4](https://github.com/isaacus-dev/open-australian-legal-corpus-creator/issues/4).
