@@ -142,6 +142,7 @@ All notable changes to the Open Australian Legal Corpus Creator will be document
 - Reduced excessive line breaks in texts.
 - Improved the extraction and cleaning of citations.
 
+[3.1.2]: https://github.com/isaacus-dev/open-australian-legal-corpus-creator/compare/v3.1.1...v3.1.2
 [3.1.1]: https://github.com/isaacus-dev/open-australian-legal-corpus-creator/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/isaacus-dev/open-australian-legal-corpus-creator/compare/v3.0.4...v3.1.0
 [3.0.4]: https://github.com/isaacus-dev/open-australian-legal-corpus-creator/compare/v3.0.3...v3.0.4
